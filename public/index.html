@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>sonic ledger</title>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:wght@400;600;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/styles.css">
+<!-- pinned to match the socket.io version in package.json, so client/server protocol match -->
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+</head>
+<body>
+<section id="auth" class="hide">
+  <div class="authbox">
+    <div class="brand"><h1>sonic ledger</h1><p>Real-time Spotify stats, friends, and a weekly contest.</p></div>
+    <div class="form">
+      <a class="btn spb" href="/auth/spotify">Continue with Spotify</a>
+      <a class="btn gob" href="/auth/google">Continue with Google</a>
+      <p class="lab">Connecting Spotify is what turns on real-time tracking. Google sign-in alone just creates your account — add Spotify afterward from Connect.</p>
+    </div>
+  </div>
+</section>
+
+<div id="app" class="hide">
+  <header class="bar">
+    <span class="logo">sonic ledger</span>
+    <nav class="seg" id="tabs">
+      <button aria-pressed="true" data-t="overview">Overview</button>
+      <button aria-pressed="false" data-t="friends">Friends</button>
+      <button aria-pressed="false" data-t="connect">Connect</button>
+    </nav>
+    <span class="sp"></span>
+    <span class="av" id="av"></span><span id="nm" style="font-weight:600"></span>
+    <button class="sm" id="out">Log out</button>
+  </header>
+  <main>
+    <div id="t-overview">
+      <div class="row" style="margin-bottom:16px">
+        <div class="seg" id="range" role="group" aria-label="Time range"></div>
+      </div>
+      <div id="empty" class="c empty hide"><h2>No listening yet</h2><p class="lab">Connect Spotify, or play something and check back in a few seconds.</p><button class="btn pri" id="go-connect">Go to Connect</button></div>
+      <div id="data" class="grid">
+        <section class="c hero">
+          <div><div class="lab">Time listened</div><div class="big" id="mins">0m</div>
+            <div class="tiles"><div class="tile"><b id="plays">0</b><span class="lab">plays</span></div><div class="tile"><b id="songs">0</b><span class="lab">unique songs</span></div><div class="tile"><b id="artistsN">0</b><span class="lab">artists</span></div></div></div>
+          <div id="live1" class="top1"></div>
+        </section>
+        <section class="c s8"><h2>Vibe radar</h2><p class="lab" id="radarnote">Average audio traits, time-weighted</p><svg id="radar" viewBox="0 0 300 260"></svg></section>
+        <section class="c s4"><h2>Platforms</h2><div id="plat"></div>
+          <h2 style="margin-top:16px">Scrobble velocity</h2><p class="lab" id="vel"></p></section>
+        <section class="c s6"><h2>Listening clock</h2><svg id="clock" viewBox="0 0 320 240"></svg></section>
+        <section class="c s6"><h2>Top artists</h2><ul id="artists"></ul></section>
+        <section class="c"><h2>Top tracks</h2><ul id="tracks"></ul></section>
+      </div>
+    </div>
+
+    <div id="t-friends" class="hide"><div class="grid">
+      <section class="c s5"><h2>Your handle</h2><p class="lab">Share this so friends can add you. Adding someone only lets <i>you</i> see <i>them</i> — ask them to add you back so it goes both ways.</p>
+        <div class="big" id="myhandle" style="font-size:28px;margin:8px 0 14px"></div>
+        <div class="row"><input id="fh" placeholder="Friend's handle"><button class="btn pri" id="fadd">Add</button></div><p class="msg" id="fmsg"></p></section>
+      <section class="c s7"><h2>Weekly contest</h2><p class="lab">Minutes this week, resets Monday</p><ul id="board"></ul></section>
+      <section class="c"><h2>Live now</h2><ul id="live"></ul></section>
+      <section class="c"><h2>Compare with a friend</h2><div class="row" id="cmpick" style="margin:8px 0"></div><div id="cmp"></div></section>
+    </div></div>
+
+    <div id="t-connect" class="hide"><div class="grid">
+      <section class="c s6"><h2>Spotify <span class="pill live" id="spok" hidden>Connected</span></h2>
+        <p class="lab">Needed for real-time tracking, the listening clock, radar, and the weekly contest.</p>
+        <a class="btn spb" href="/auth/spotify">Connect Spotify</a></section>
+      <section class="c s6"><h2>YouTube Music history (optional)</h2>
+        <ol class="steps"><li>At takeout.google.com pick YouTube and YouTube Music, History, JSON format.</li><li>Choose the <b>watch-history.json</b> file below.</li></ol>
+        <input type="file" id="ytfile" accept=".json"> <p class="msg" id="ytmsg"></p></section>
+      <section class="c"><h2>Export a playlist back to Spotify</h2>
+        <div class="row">
+          <select id="plsrc"><option value="top">Top tracks</option><option value="gems">Underplayed favorites</option><option value="blast">Blast from the past</option><option value="time">This time last year</option></select>
+          <input id="plname" placeholder="Playlist name" value="sonic ledger mix">
+          <button class="btn pri" id="plmake">Create on Spotify</button>
+        </div><p class="msg" id="plmsg"></p></section>
+    </div></div>
+  </main>
+</div>
+<script src="/app.js"></script>
+</body>
+</html>
