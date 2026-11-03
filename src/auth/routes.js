@@ -79,10 +79,14 @@ auth.get('/spotify/callback', async (req, res, next) => {
 
     const profRes = await fetch('https://api.spotify.com/v1/me', { headers: { Authorization: `Bearer ${t.access_token}` } });
     if (!profRes.ok) throw Object.assign(new Error('spotify_profile_failed'), { status: 400 });
-    const p = await profRes.json();
-    if (!p.email) return res.status(400).send('Your Spotify account has no email on file, which Tunelog needs to create an account.');
+       const p = await profRes.json();
+    // Some Spotify accounts don't expose an email (Facebook/Apple sign-up, privacy
+    // settings). Fall back to a stable placeholder instead of blocking sign-in.
+    const email = p.email || `spotify-${p.id}@sonic-ledger.local`;
 
-    const user = await findOrCreateUser({ email: p.email, name: p.display_name, avatar: p.images?.[0]?.url });
+    // If this browser already has a session (e.g. signed in with Google first), link
+    // Spotify to that same account instead of creating a separate one.
+    const user = req.user || await findOrCreateUser({ email, name: p.display_name, avatar: p.images?.[0]?.url });
 
     const link = await db.one(
       `insert into platform_links (user_id, platform, access_token, refresh_token, scopes, expires_at, state, last_poll_at)
