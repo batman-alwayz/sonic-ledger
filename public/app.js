@@ -13,6 +13,9 @@ async function start() {
   const r = await api("/me");
   if (!r.ok) { $("auth").classList.remove("hide"); $("app").classList.add("hide"); return }
   const me = r.j.user; myId = me.id;
+  if (me.connected?.includes('spotify')) {
+  document.querySelector('a[href="/auth/spotify"]').outerHTML = '<span class="pill live">Connected</span>';
+}
   $("auth").classList.add("hide"); $("app").classList.remove("hide");
   $("nm").textContent = me.display_name; $("av").textContent = (me.display_name || "?")[0].toUpperCase(); $("av").style.background = `hsl(${hue(me.display_name)} 70% 65%)`;
   $("myhandle").textContent = "@" + me.handle;

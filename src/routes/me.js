@@ -7,7 +7,10 @@ import { z } from 'zod';
 export const me = Router();
 me.use(requireUser);
 
-me.get('/', (req, res) => res.json({ user: req.user }));
+me.get('/', async (req, res) => {
+  const links = await db.many('select platform from platform_links where user_id=$1', [req.user.id]);
+  res.json({ user: req.user, connected: links.map(l => l.platform) });
+});
 
 me.get('/stats', async (req, res) => {
   const w = z.enum(['7d', '4w', '6m', '1y', 'all']).catch('4w').parse(req.query.window);
